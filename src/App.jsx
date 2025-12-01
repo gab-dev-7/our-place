@@ -6,8 +6,29 @@ import roomImage from "./ourRoom2.png";
 export default function App() {
   const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE'
 
+  // Helper component for invisible buttons to keep code clean
+  function ClickZone({ top, left, width, height, label, onClick }) {
+    return (
+      <div
+        onClick={onClick}
+        className="absolute cursor-pointer group z-20"
+        style={{ top, left, width, height }}
+      >
+        {/* The Glow Effect (Only visible on hover) */}
+        <div className="w-full h-full rounded-xl border-2 border-white/0 group-hover:border-white/50 group-hover:bg-white/10 transition-all duration-300 relative">
+          {/* The Floating Label */}
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+            <div className="bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-full shadow-lg font-bold text-xs whitespace-nowrap border border-white/20">
+              {label}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen w-screen overflow-hidden bg-slate-900 text-white">
+    <div className="h-screen w-screen overflow-hidden bg-slate-900 text-white font-sans">
       <AnimatePresence mode="wait">
         {/* VIEW 1: THE COZY ROOM */}
         {view === "ROOM" && (
@@ -15,59 +36,68 @@ export default function App() {
             key="room"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.5, x: 100 }} // Slight zoom + shift right when entering fridge
+            exit={{ opacity: 0, scale: 1.5, x: 100 }}
             transition={{ duration: 0.5 }}
             className="relative h-full w-full bg-cover bg-center"
-            style={{
-              // 1. Point to your local file in the public folder
-              backgroundImage: `url(${roomImage})`,
-            }}
+            style={{ backgroundImage: `url(${roomImage})` }}
           >
-            {/* Dark Overlay (lighter this time so we see the art) */}
+            {/* Dark Overlay (Very subtle, just to blend it) */}
             <div className="absolute inset-0 bg-black/10"></div>
 
-            {/* The "Welcome" Text */}
-            <div className="absolute top-10 left-0 right-0 text-center drop-shadow-md z-10">
-              <h1 className="text-4xl font-bold font-serif tracking-widest text-white/90">
+            {/* Header Text */}
+            <div className="absolute top-8 left-0 right-0 text-center z-10 pointer-events-none">
+              <h1
+                className="text-3xl md:text-5xl font-bold tracking-widest text-white drop-shadow-lg opacity-90"
+                style={{ fontFamily: "serif" }}
+              >
                 OUR PLACE
               </h1>
-              <p className="text-sm uppercase tracking-[0.3em] opacity-80 mt-2">
+              <p className="text-xs uppercase tracking-[0.4em] opacity-80 mt-2">
                 Est. 2024
               </p>
             </div>
 
-            {/* --- CLICK ZONE: The Fridge --- */}
-            {/* I calculated these % based on your image. It covers the fridge on the left. */}
-            <div
+            {/* --- CLICK ZONES --- */}
+
+            {/* 1. FRIDGE (Left side, tall) */}
+            <ClickZone
+              top="28%"
+              left="1%"
+              width="17%"
+              height="58%"
+              label="Open Fridge 🧊"
               onClick={() => setView("FRIDGE")}
-              className="absolute top-[35%] left-[6%] w-[18%] h-[50%] cursor-pointer group z-20"
-            >
-              {/* Hover Effect: A subtle glow around the fridge area */}
-              <div className="w-full h-full rounded-xl border-2 border-white/0 group-hover:border-white/40 group-hover:bg-white/5 transition-all duration-300 relative">
-                {/* The Label tag */}
-                <div className="absolute -right-2 top-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-10">
-                  <div className="bg-white text-black px-3 py-1 rounded shadow-lg font-bold text-sm whitespace-nowrap">
-                    Open Fridge 🧊
-                    {/* Little triangle pointer */}
-                    <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-r-[8px] border-r-white border-b-[6px] border-b-transparent"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            />
 
-            {/* --- COMING SOON ZONES (Optional placeholders) --- */}
+            {/* 2. MAP (Wall, above sofa) */}
+            <ClickZone
+              top="10%"
+              left="24%"
+              width="28%"
+              height="32%"
+              label="Orbit Map 📍"
+              onClick={() => alert("Coming Soon: The Map!")}
+            />
 
-            {/* The Map (Orbit) */}
-            <div
-              className="absolute top-[10%] left-[25%] w-[25%] h-[30%] cursor-help opacity-50 hover:opacity-100 hover:bg-white/10 rounded-lg transition-all"
-              title="Coming Soon: Orbit Map"
-            ></div>
+            {/* 3. TV (Center-Right, foreground) */}
+            <ClickZone
+              top="45%"
+              left="52%"
+              width="28%"
+              height="35%"
+              label="Watch Movie 🎬"
+              onClick={() => alert("Coming Soon: Movie Night!")}
+            />
 
-            {/* The PC (Games) */}
-            <div
-              className="absolute bottom-[20%] right-[0%] w-[30%] h-[40%] cursor-help opacity-50 hover:opacity-100 hover:bg-white/10 rounded-lg transition-all"
-              title="Coming Soon: Arcade"
-            ></div>
+            {/* 4. PC (Far Right, desk) */}
+            <ClickZone
+              top="48%"
+              left="82%"
+              width="18%"
+              height="40%"
+              label="Arcade 👾"
+              onClick={() => alert("Coming Soon: Games!")}
+            />
           </motion.div>
         )}
 
@@ -75,7 +105,7 @@ export default function App() {
         {view === "FRIDGE" && (
           <motion.div
             key="fridge"
-            initial={{ opacity: 0, x: -50 }} // Slide in from left (since fridge is on left)
+            initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.4 }}
