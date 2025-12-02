@@ -1,6 +1,9 @@
 # Ignores sensitive environment variables
 .env
 
+#gemini
+GEMINI.md
+
 # Logs
 logs
 *.log
