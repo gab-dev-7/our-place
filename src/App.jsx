@@ -1,12 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Fridge } from "./components/Fridge";
 import { motion, AnimatePresence } from "framer-motion";
 import roomImage from "./ourRoom2.png";
 import { Timeline } from "./components/Timeline";
 import { Arcade } from "./components/Arcade";
+import { supabase } from "./supabaseClient";
+import { Auth } from "./components/Auth";
 
 export default function App() {
   const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE', 'TIMELINE', 'ARCADE'
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   // Helper component for invisible buttons to keep code clean
   function ClickZone({ top, left, width, height, label, onClick }) {
     return (
@@ -26,6 +44,10 @@ export default function App() {
         </div>
       </div>
     );
+  }
+
+  if (!session) {
+    return <Auth />;
   }
 
   return (
@@ -133,7 +155,7 @@ export default function App() {
             transition={{ duration: 0.4 }}
             className="h-full w-full"
           >
-            <Arcade onBack={() => setView("ROOM")} />
+            <Arcade session={session} onBack={() => setView("ROOM")} />
           </motion.div>
         )}
       </AnimatePresence>

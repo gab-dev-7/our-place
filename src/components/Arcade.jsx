@@ -29,12 +29,13 @@ const Spinner = () => (
   </div>
 );
 
-export function Arcade({ onBack }) {
+export function Arcade({ onBack, session }) {
   const [activeTab, setActiveTab] = useState("tasks");
   const [tasks, setTasks] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [balances, setBalances] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Manages render state
+  const user = session.user;
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -55,7 +56,6 @@ export function Arcade({ onBack }) {
       .from("rpg_balances")
       .select("*");
 
-    // Safety check: Log errors if they occur (this will fix the silent crash!)
     if (tasksError) console.error("Tasks Fetch Error:", tasksError);
     if (rewardsError) console.error("Rewards Fetch Error:", rewardsError);
     if (balancesError) console.error("Balances Fetch Error:", balancesError);
@@ -71,49 +71,42 @@ export function Arcade({ onBack }) {
   async function completeTask(task) {
     if (task.is_completed) return;
 
-    // Use a safety measure for the current user (hardcoded to 'me' for now)
-    const userBalance = balances.find((b) => b.user_name === "me");
+    const userBalance = balances.find((b) => b.user_id === user.id);
     if (!userBalance) return;
 
     const newBalance = userBalance.gold_balance + task.gold_reward;
 
-    // 1. Update balance
     await supabase
       .from("rpg_balances")
       .update({ gold_balance: newBalance })
-      .eq("id", userBalance.id);
+      .eq("user_id", user.id);
 
-    // 2. Mark task as completed
     await supabase
       .from("rpg_tasks")
       .update({ is_completed: true })
       .eq("id", task.id);
 
-    // 3. Refresh data
     fetchData();
   }
 
   async function redeemReward(reward) {
-    const userBalance = balances.find((b) => b.user_name === "me");
+    const userBalance = balances.find((b) => b.user_id === user.id);
     if (!userBalance || reward.cost > userBalance.gold_balance) {
       alert("Not enough gold!");
       return;
     }
 
-    // 1. Update balance
     const newBalance = userBalance.gold_balance - reward.cost;
     await supabase
       .from("rpg_balances")
       .update({ gold_balance: newBalance })
-      .eq("id", userBalance.id);
+      .eq("user_id", user.id);
 
-    // 2. Mark reward as redeemed
     await supabase
       .from("rpg_rewards")
-      .update({ is_redeemed: true, redeemed_by: "me" })
+      .update({ is_redeemed: true, redeemed_by: user.id })
       .eq("id", reward.id);
 
-    // 3. Refresh data
     fetchData();
   }
 
@@ -121,7 +114,11 @@ export function Arcade({ onBack }) {
   const renderTaskCard = (task) => (
     <div
       key={task.id}
-      className={`p-4 rounded-lg shadow-md flex justify-between items-center transition-colors ${task.is_completed ? "bg-green-100 text-green-700 opacity-60" : "bg-white hover:shadow-lg"}`}
+      className={`p-4 rounded-lg shadow-md flex justify-between items-center transition-colors ${
+        task.is_completed
+          ? "bg-green-100 text-green-700 opacity-60"
+          : "bg-white hover:shadow-lg"
+      }`}
     >
       <div>
         <h3
@@ -130,16 +127,18 @@ export function Arcade({ onBack }) {
           {task.title}
         </h3>
         <p className="text-xs text-slate-500">
-          Assigned to: {task.assigned_to === "me" ? "You" : task.assigned_to}
+          Assigned to: {task.assigned_to === user.id ? "You" : "Partner"}
         </p>
       </div>
       <div className="flex items-center gap-3">
         <span
-          className={`text-sm font-bold flex items-center gap-1 ${task.is_completed ? "text-green-700" : "text-yellow-600"}`}
+          className={`text-sm font-bold flex items-center gap-1 ${
+            task.is_completed ? "text-green-700" : "text-yellow-600"
+          }`}
         >
           +{task.gold_reward} <Coins size={16} />
         </span>
-        {!task.is_completed && task.assigned_to === "me" && (
+        {!task.is_completed && task.assigned_to === user.id && (
           <button
             onClick={() => completeTask(task)}
             className="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors"
@@ -154,7 +153,11 @@ export function Arcade({ onBack }) {
   const renderRewardCard = (reward) => (
     <div
       key={reward.id}
-      className={`p-4 rounded-lg shadow-md flex justify-between items-center transition-colors ${reward.is_redeemed ? "bg-slate-200 opacity-50" : "bg-white hover:shadow-lg"}`}
+      className={`p-4 rounded-lg shadow-md flex justify-between items-center transition-colors ${
+        reward.is_redeemed
+          ? "bg-slate-200 opacity-50"
+          : "bg-white hover:shadow-lg"
+      }`}
     >
       <div>
         <h3 className="font-semibold">{reward.name}</h3>
@@ -162,7 +165,9 @@ export function Arcade({ onBack }) {
       </div>
       <div className="flex items-center gap-3">
         <span
-          className={`text-sm font-bold flex items-center gap-1 ${reward.is_redeemed ? "text-slate-500" : "text-red-600"}`}
+          className={`text-sm font-bold flex items-center gap-1 ${
+            reward.is_redeemed ? "text-slate-500" : "text-red-600"
+          }`}
         >
           {reward.cost} <Coins size={16} />
         </span>
@@ -171,7 +176,7 @@ export function Arcade({ onBack }) {
             onClick={() => redeemReward(reward)}
             className="bg-red-500 text-white px-3 py-1 text-sm rounded-full hover:bg-red-600 transition-colors"
             disabled={
-              balances.find((b) => b.user_name === "me").gold_balance <
+              balances.find((b) => b.user_id === user.id)?.gold_balance <
               reward.cost
             }
           >
@@ -182,9 +187,8 @@ export function Arcade({ onBack }) {
     </div>
   );
 
-  // Simple hardcoded balance display
-  const myBalance = balances.find((b) => b.user_name === "me");
-  const partnerBalance = balances.find((b) => b.user_name === "partner");
+  const myBalance = balances.find((b) => b.user_id === user.id);
+  const partnerBalance = balances.find((b) => b.user_id !== user.id);
 
   return (
     <div className="min-h-screen w-full bg-gray-100 p-6 relative">
@@ -226,13 +230,21 @@ export function Arcade({ onBack }) {
           <div className="flex border-b mb-6">
             <button
               onClick={() => setActiveTab("tasks")}
-              className={`px-4 py-2 text-lg font-semibold transition-colors ${activeTab === "tasks" ? "border-b-4 border-blue-500 text-blue-600" : "text-gray-500"}`}
+              className={`px-4 py-2 text-lg font-semibold transition-colors ${
+                activeTab === "tasks"
+                  ? "border-b-4 border-blue-500 text-blue-600"
+                  : "text-gray-500"
+              }`}
             >
               My Tasks
             </button>
             <button
               onClick={() => setActiveTab("shop")}
-              className={`px-4 py-2 text-lg font-semibold transition-colors ${activeTab === "shop" ? "border-b-4 border-blue-500 text-blue-600" : "text-gray-500"}`}
+              className={`px-4 py-2 text-lg font-semibold transition-colors ${
+                activeTab === "shop"
+                  ? "border-b-4 border-blue-500 text-blue-600"
+                  : "text-gray-500"
+              }`}
             >
               Item Shop
             </button>
@@ -241,7 +253,9 @@ export function Arcade({ onBack }) {
           {/* Content */}
           <div className="max-w-3xl mx-auto space-y-4">
             {activeTab === "tasks" && tasks.length > 0 ? (
-              tasks.map(renderTaskCard)
+              tasks
+                .filter((t) => t.assigned_to === user.id)
+                .map(renderTaskCard)
             ) : activeTab === "tasks" ? (
               <p className="text-center text-gray-500 py-10">
                 No tasks currently assigned!
