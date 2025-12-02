@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import roomImage from "./ourRoom2.png";
 import { Timeline } from "./components/Timeline";
 import { Arcade } from "./components/Arcade";
-import { LivingRoom } from "./components/LivingRoom"; // New Import
+import { LivingRoom } from "./components/LivingRoom";
+import { FutureDreams } from "./components/FutureDreams";
 import { supabase } from "./supabaseClient";
 import { Auth } from "./components/Auth";
 
 export default function App() {
-  const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE', 'TIMELINE', 'ARCADE', 'LIVING_ROOM' // Updated comment
+  const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE', 'TIMELINE', 'ARCADE', 'LIVING_ROOM', 'FUTURE_DREAMS'
   const [session, setSession] = useState(null);
 
   useEffect(() => {
@@ -98,7 +99,16 @@ export default function App() {
               label="Orbit Map 📍"
               onClick={() => setView("TIMELINE")}
             />
-            {/* 3. TV (Center-Right, foreground) */}
+            {/* 3. WINDOW (Top-left) */}
+            <ClickZone
+              top="15%"
+              left="5%"
+              width="15%"
+              height="25%"
+              label="Look Outside 🏞️"
+              onClick={() => setView("FUTURE_DREAMS")}
+            />
+            {/* 4. TV (Center-Right, foreground) */}
             <ClickZone
               top="45%"
               left="52%"
@@ -107,14 +117,14 @@ export default function App() {
               label="Watch Movie 🎬"
               onClick={() => setView("LIVING_ROOM")} // Updated onClick
             />
-            // 4. PC (Far Right, desk)
+            // 5. PC (Far Right, desk)
             <ClickZone
               top="48%"
               left="82%"
               width="18%"
               height="40%"
               label="Arcade 👾"
-              onClick={() => setView("ARCADE")} // <--- MUST BE 'ARCADE', NOT 'BINDER'
+              onClick={() => setView("ARCADE")} 
             />
           </motion.div>
         )}
@@ -171,6 +181,20 @@ export default function App() {
             className="h-full w-full"
           >
             <LivingRoom session={session} onBack={() => setView("ROOM")} />
+          </motion.div>
+        )}
+
+        {/* VIEW 6: THE FUTURE & DREAMS WINDOW */}
+        {view === "FUTURE_DREAMS" && (
+          <motion.div
+            key="future-dreams"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="h-full w-full"
+          >
+            <FutureDreams session={session} onBack={() => setView("ROOM")} />
           </motion.div>
         )}
       </AnimatePresence>
