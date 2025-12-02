@@ -81,12 +81,12 @@ export default function App() {
               </p>
             </div>
             {/* --- CLICK ZONES --- */}
-            {/* 1. FRIDGE (Left side, tall) */}
+            {/* 1. FRIDGE */}
             <ClickZone
-              top="28%"
-              left="1%"
-              width="17%"
-              height="58%"
+              top="26.5%"
+              left="8.5%"
+              width="17.5%"
+              height="64.0%"
               label="Open Fridge 🧊"
               onClick={() => setView("FRIDGE")}
             />
@@ -99,32 +99,50 @@ export default function App() {
               label="Orbit Map 📍"
               onClick={() => setView("TIMELINE")}
             />
-            {/* 3. WINDOW (Top-left) */}
+            {/* 3. WINDOW */}
             <ClickZone
-              top="15%"
-              left="5%"
-              width="15%"
-              height="25%"
+              top="6.0%"
+              left="58.0%"
+              width="26.0%"
+              height="43.0%"
               label="Look Outside 🏞️"
               onClick={() => setView("FUTURE_DREAMS")}
             />
-            {/* 4. TV (Center-Right, foreground) */}
+            {/* 4. TV */}
             <ClickZone
-              top="45%"
-              left="52%"
-              width="28%"
-              height="35%"
+              top="43.0%"
+              left="52.0%"
+              width="19.0%"
+              height="37.0%"
               label="Watch Movie 🎬"
-              onClick={() => setView("LIVING_ROOM")} // Updated onClick
+              onClick={() => setView("LIVING_ROOM")}
             />
-            // 5. PC (Far Right, desk)
+            {/* 5. PC (Computer) */}
             <ClickZone
-              top="48%"
-              left="82%"
-              width="18%"
-              height="40%"
+              top="49.0%"
+              left="82.0%"
+              width="14.5%"
+              height="23.0%"
               label="Arcade 👾"
-              onClick={() => setView("ARCADE")} 
+              onClick={() => setView("ARCADE")}
+            />
+            {/* 6. COUCH */}
+            <ClickZone
+              top="42.0%"
+              left="25.5%"
+              width="28.0%"
+              height="34.0%"
+              label="Relax on Couch 🛋️"
+              onClick={() => alert("Coming Soon: Digital Memory Archive!")}
+            />
+            {/* 7. CARPET (bottom left) */}
+            <ClickZone
+              top="85.0%"
+              left="0.0%"
+              width="45.0%"
+              height="15.0%"
+              label="Check Milestones 📜"
+              onClick={() => alert("Coming Soon: Milestones Ledger!")}
             />
           </motion.div>
         )}
