@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import roomImage from "./ourRoom2.png";
 import { Timeline } from "./components/Timeline";
 import { Arcade } from "./components/Arcade";
+import { LivingRoom } from "./components/LivingRoom"; // New Import
 import { supabase } from "./supabaseClient";
 import { Auth } from "./components/Auth";
 
 export default function App() {
-  const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE', 'TIMELINE', 'ARCADE'
+  const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE', 'TIMELINE', 'ARCADE', 'LIVING_ROOM' // Updated comment
   const [session, setSession] = useState(null);
 
   useEffect(() => {
@@ -104,7 +105,7 @@ export default function App() {
               width="28%"
               height="35%"
               label="Watch Movie 🎬"
-              onClick={() => alert("Coming Soon: Movie Night!")}
+              onClick={() => setView("LIVING_ROOM")} // Updated onClick
             />
             // 4. PC (Far Right, desk)
             <ClickZone
@@ -156,6 +157,20 @@ export default function App() {
             className="h-full w-full"
           >
             <Arcade session={session} onBack={() => setView("ROOM")} />
+          </motion.div>
+        )}
+
+        {/* VIEW 5: THE VIRTUAL LIVING ROOM */}
+        {view === "LIVING_ROOM" && (
+          <motion.div
+            key="living-room"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="h-full w-full"
+          >
+            <LivingRoom session={session} onBack={() => setView("ROOM")} />
           </motion.div>
         )}
       </AnimatePresence>
