@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Fridge } from "./components/Fridge";
 import { motion, AnimatePresence } from "framer-motion";
 import roomImage from "./ourRoom2.png";
+import { Timeline } from "./components/Timeline";
+import { Arcade } from "./components/Arcade";
 
 export default function App() {
-  const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE'
-
+  const [view, setView] = useState("ROOM"); // Options: 'ROOM', 'FRIDGE', 'TIMELINE', 'ARCADE'
   // Helper component for invisible buttons to keep code clean
   function ClickZone({ top, left, width, height, label, onClick }) {
     return (
@@ -43,7 +44,6 @@ export default function App() {
           >
             {/* Dark Overlay (Very subtle, just to blend it) */}
             <div className="absolute inset-0 bg-black/10"></div>
-
             {/* Header Text */}
             <div className="absolute top-8 left-0 right-0 text-center z-10 pointer-events-none">
               <h1
@@ -56,9 +56,7 @@ export default function App() {
                 Est. 2024
               </p>
             </div>
-
             {/* --- CLICK ZONES --- */}
-
             {/* 1. FRIDGE (Left side, tall) */}
             <ClickZone
               top="28%"
@@ -68,7 +66,6 @@ export default function App() {
               label="Open Fridge 🧊"
               onClick={() => setView("FRIDGE")}
             />
-
             {/* 2. MAP (Wall, above sofa) */}
             <ClickZone
               top="10%"
@@ -76,9 +73,8 @@ export default function App() {
               width="28%"
               height="32%"
               label="Orbit Map 📍"
-              onClick={() => alert("Coming Soon: The Map!")}
+              onClick={() => setView("TIMELINE")}
             />
-
             {/* 3. TV (Center-Right, foreground) */}
             <ClickZone
               top="45%"
@@ -88,15 +84,14 @@ export default function App() {
               label="Watch Movie 🎬"
               onClick={() => alert("Coming Soon: Movie Night!")}
             />
-
-            {/* 4. PC (Far Right, desk) */}
+            // 4. PC (Far Right, desk)
             <ClickZone
               top="48%"
               left="82%"
               width="18%"
               height="40%"
               label="Arcade 👾"
-              onClick={() => alert("Coming Soon: Games!")}
+              onClick={() => setView("ARCADE")} // <--- MUST BE 'ARCADE', NOT 'BINDER'
             />
           </motion.div>
         )}
@@ -112,6 +107,33 @@ export default function App() {
             className="h-full w-full"
           >
             <Fridge onBack={() => setView("ROOM")} />
+          </motion.div>
+        )}
+        {/* VIEW 3: THE TIMELINE (Memory Lane) */}
+        {view === "TIMELINE" && (
+          <motion.div
+            key="timeline"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="h-full w-full"
+          >
+            {/* We will build this component next! */}
+            <Timeline onBack={() => setView("ROOM")} />
+          </motion.div>
+        )}
+        {/* VIEW 4: THE ARCADE (Gamified RPG) */}
+        {view === "ARCADE" && (
+          <motion.div
+            key="arcade"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="h-full w-full"
+          >
+            <Arcade onBack={() => setView("ROOM")} />
           </motion.div>
         )}
       </AnimatePresence>

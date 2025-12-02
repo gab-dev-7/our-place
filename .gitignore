@@ -1,3 +1,6 @@
+# Ignores sensitive environment variables
+.env
+
 # Logs
 logs
 *.log
