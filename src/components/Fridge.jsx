@@ -18,10 +18,10 @@ export function Fridge({ onBack }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
-    }),
+    })
   );
 
-  // 2. Load items (Moved INSIDE useEffect to prevent linter errors)
+  // 2. Load items
   useEffect(() => {
     async function fetchItems() {
       const { data, error } = await supabase.from("fridge_items").select("*");
@@ -40,9 +40,8 @@ export function Fridge({ onBack }) {
     const newX = Number(item.x) + delta.x;
     const newY = Number(item.y) + delta.y;
 
-    // Optimistic UI Update
     setItems((prev) =>
-      prev.map((i) => (i.id === active.id ? { ...i, x: newX, y: newY } : i)),
+      prev.map((i) => (i.id === active.id ? { ...i, x: newX, y: newY } : i))
     );
 
     await supabase
@@ -75,6 +74,20 @@ export function Fridge({ onBack }) {
     }
   }
 
+  // 5. Delete Note
+  async function handleDelete(id) {
+    // Optimistic UI update
+    setItems((prev) => prev.filter((i) => i.id !== id));
+
+    const { error } = await supabase.from("fridge_items").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting item:", error);
+      // If the delete fails, we might want to revert the state
+      // For now, we'll just log the error
+    }
+  }
+
   return (
     <div className="min-h-screen w-full bg-slate-100 overflow-hidden relative">
       {/* Background Dots */}
@@ -100,7 +113,7 @@ export function Fridge({ onBack }) {
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {items.map((item) => (
-          <DraggableItem key={item.id} item={item} />
+          <DraggableItem key={item.id} item={item} onDelete={handleDelete} />
         ))}
       </DndContext>
 

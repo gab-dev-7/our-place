@@ -187,15 +187,17 @@ export function LivingRoom({ onBack, session }) {
       ) : (
         <div className="w-full max-w-4xl aspect-video bg-black rounded-lg shadow-2xl overflow-hidden relative">
           {currentVideoId ? (
-            <YouTube
-              videoId={currentVideoId}
-              opts={opts}
-              onReady={onPlayerReady}
-              onPlay={onPlayVideo}
-              onPause={onPauseVideo}
-              onStateChange={onPlayerStateChange}
-              className="youtube-player" // For potential CSS targeting
-            />
+            <div className="absolute top-0 left-0 w-full h-full">
+              <YouTube
+                videoId={currentVideoId}
+                opts={opts}
+                onReady={onPlayerReady}
+                onPlay={onPlayVideo}
+                onPause={onPauseVideo}
+                onStateChange={onPlayerStateChange}
+                className="w-full h-full" // For potential CSS targeting
+              />
+            </div>
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-slate-400">
               No video set. Enter a YouTube URL below.
