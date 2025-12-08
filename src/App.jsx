@@ -39,7 +39,7 @@ export default function App() {
         style={{ top, left, width, height }}
       >
         {/* The Glow Effect (Only visible on hover) */}
-        <div className="w-full h-full rounded-xl border-2 border-red-500 group-hover:border-white/50 group-hover:bg-white/10 transition-all duration-300 relative">
+        <div className="w-full h-full rounded-xl group-hover:border-white/50 group-hover:bg-white/10 transition-all duration-300 relative">
           {/* The Floating Label */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
             <div className="bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-full shadow-lg font-bold text-xs whitespace-nowrap border border-white/20">
