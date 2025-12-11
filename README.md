@@ -1,7 +1,3 @@
-Here’s a refined, more engaging, and professional version of your README—while preserving your voice and vision:
-
----
-
 # 🏠 Our Place – A Digital Apartment for Long-Distance Couples
 
 > A shared, interactive space to connect, reminisce, and dream together—no matter the distance.
@@ -25,7 +21,6 @@ Navigate your digital home through intuitive "rooms," each serving a unique emot
 
 - **✨ The Digital Fridge**  
   A real-time, drag-and-drop canvas for sticky notes and shared photos—just like the one back home.
->>>>>>> dcda9fe (better readme)
 
 - **🎮 The Relationship RPG (Arcade)**  
   Turn daily tasks into a playful co-op game with XP, rewards, and a shared virtual currency.
