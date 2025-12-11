@@ -30,8 +30,6 @@ The application is structured around a central "room" from which users can acces
 
 ## Roadmap
 
-See the [open issues](https://github.com/your_username_/our-place/issues) for a list of proposed features (and known issues).
-
 Future plans include:
 
 - **Couch Module:**
