@@ -14,9 +14,6 @@ Think of it as your apartment in the cloud, complete with a fridge, living room,
 
 ## 🏡 Features
 
-<<<<<<< HEAD
-Future plans include:
-=======
 Navigate your digital home through intuitive "rooms," each serving a unique emotional or practical purpose:
 
 - **✨ The Digital Fridge**  
