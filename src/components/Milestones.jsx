@@ -47,7 +47,7 @@ export function Milestones({ onBack, session }) {
         .select("*", { count: "exact", head: true });
 
       // Fetch high score
-      const { data: balances, error } = await supabase
+      const { data: balances } = await supabase
         .from("rpg_balances")
         .select("balance")
         .order("balance", { ascending: false })

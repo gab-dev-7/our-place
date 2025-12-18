@@ -15,6 +15,8 @@ L.Icon.Default.mergeOptions({
 });
 
 
+const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
 export function Timeline({ onBack, session }) {
   const [memories, setMemories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ export function Timeline({ onBack, session }) {
         <div className="h-[50vh] w-full rounded-xl overflow-hidden shadow-2xl mb-24 border-4 border-slate-800">
           <MapContainer center={[10, -20]} zoom={2} scrollWheelZoom={true} className="h-full w-full">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              attribution={attribution}
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
             {locations.map(location => (

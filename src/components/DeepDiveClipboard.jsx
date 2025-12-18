@@ -12,8 +12,7 @@ const getDayOfYear = () => {
   return Math.floor(diff / oneDay);
 };
 
-export function DeepDiveClipboard() {
-  const [isOpen, setIsOpen] = useState(false);
+export function DeepDiveClipboard({ isOpen, onToggle }) {
   const [answer, setAnswer] = useState("");
   const [author, setAuthor] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -49,16 +48,16 @@ export function DeepDiveClipboard() {
     }
   }
 
-  const openModal = () => {
+  const handleOpen = () => {
     setHasSubmitted(false); // Reset submission status when opening
-    setIsOpen(true);
+    onToggle(true);
   };
 
   return (
     <>
       {/* 1. THE TRIGGER */}
       <div
-        onClick={openModal}
+        onClick={handleOpen}
         className="absolute top-8 right-32 cursor-pointer z-40 transform hover:scale-110 transition-transform duration-300 group"
       >
         <div className="bg-amber-800 w-24 h-32 rounded-lg shadow-xl relative flex flex-col items-center pt-2 border-t-8 border-gray-400">
@@ -77,14 +76,14 @@ export function DeepDiveClipboard() {
 
       {/* 2. THE MODAL */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
             <div className="bg-slate-100 p-4 border-b flex justify-between items-center">
               <h2 className="font-bold text-slate-700 flex items-center gap-2">
                 <ClipboardList className="text-blue-500" /> Daily Deep Dive
               </h2>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => onToggle(false)}
                 className="text-slate-400 hover:text-red-500"
               >
                 <X size={20} />
@@ -102,7 +101,7 @@ export function DeepDiveClipboard() {
                     Check back later to see what your partner wrote.
                   </p>
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => onToggle(false)}
                     className="mt-6 bg-slate-800 text-white px-6 py-2 rounded-full text-sm"
                   >
                     Close
@@ -112,7 +111,7 @@ export function DeepDiveClipboard() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="bg-blue-50 p-6 rounded-lg border border-blue-100 text-center">
                     <label className="text-sm font-bold text-blue-500 uppercase tracking-wider">
-                      Today's Question
+                      Today&apos;s Question
                     </label>
                     <p className="text-2xl font-semibold text-slate-800 mt-2 leading-snug">
                       {dailyQuestion || "Loading..."}

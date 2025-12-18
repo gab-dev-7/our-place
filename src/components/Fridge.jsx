@@ -13,11 +13,14 @@ import { Plus, ArrowLeft } from "lucide-react";
 
 export function Fridge({ onBack }) {
   const [items, setItems] = useState([]);
+  const [isClipboardOpen, setIsClipboardOpen] = useState(false);
 
   // 1. Setup Sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
+      // Disable dragging when the clipboard modal is open
+      enabled: !isClipboardOpen,
     })
   );
 
@@ -109,7 +112,7 @@ export function Fridge({ onBack }) {
       </div>
 
       {/* Interactive Elements */}
-      <DeepDiveClipboard />
+      <DeepDiveClipboard isOpen={isClipboardOpen} onToggle={setIsClipboardOpen} />
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {items.map((item) => (

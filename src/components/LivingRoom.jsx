@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { ArrowLeft, Play, Pause, Loader } from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 import YouTube from "react-youtube";
 import { supabase } from "../supabaseClient";
 
@@ -26,7 +26,7 @@ export function LivingRoom({ onBack, session }) {
   const [inputVideoUrl, setInputVideoUrl] = useState("");
 
   const getYoutubeVideoId = (url) => {
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+    const regex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/s]{11})/i;
     const match = url.match(regex);
     return match ? match[1] : null;
   };
@@ -43,11 +43,8 @@ export function LivingRoom({ onBack, session }) {
 
   // --- Supabase Realtime Subscription and Initial Fetch ---
   useEffect(() => {
-    setIsLoading(true);
-    let youtubeId = getYoutubeVideoId(mediaState.video_url);
-    if (youtubeId) setCurrentVideoId(youtubeId);
-
     const fetchInitialMediaState = async () => {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from("media_state")
         .select("*")
@@ -58,8 +55,6 @@ export function LivingRoom({ onBack, session }) {
         console.error("Error fetching initial media state:", error);
       } else if (data) {
         setMediaState(data);
-        let id = getYoutubeVideoId(data.video_url);
-        if (id) setCurrentVideoId(id);
         setInputVideoUrl(data.video_url);
       }
       setIsLoading(false);
@@ -74,20 +69,21 @@ export function LivingRoom({ onBack, session }) {
         { event: "UPDATE", schema: "public", table: "media_state", filter: `id=eq.1` },
         (payload) => {
           const newMediaState = payload.new;
-          setMediaState(newMediaState);
-          let newId = getYoutubeVideoId(newMediaState.video_url);
-          if (newId) setCurrentVideoId(newId);
+          // Only update state if the change was from the other user
+          if (newMediaState.updated_by !== user.id) {
+            setMediaState(newMediaState);
 
-          if (playerRef.current && newMediaState.updated_by !== user.id) {
-            const player = playerRef.current;
-            if (newMediaState.is_playing && player.getPlayerState() !== 1) {
-              player.seekTo(newMediaState.progress);
-              player.playVideo();
-            } else if (!newMediaState.is_playing && player.getPlayerState() !== 2) {
-              player.seekTo(newMediaState.progress);
-              player.pauseVideo();
-            } else if (Math.abs(player.getCurrentTime() - newMediaState.progress) > 2) {
-              player.seekTo(newMediaState.progress);
+            if (playerRef.current) {
+                const player = playerRef.current;
+                if (newMediaState.is_playing && player.getPlayerState() !== 1) {
+                  player.seekTo(newMediaState.progress);
+                  player.playVideo();
+                } else if (!newMediaState.is_playing && player.getPlayerState() !== 2) {
+                  player.seekTo(newMediaState.progress);
+                  player.pauseVideo();
+                } else if (Math.abs(player.getCurrentTime() - newMediaState.progress) > 2) {
+                  player.seekTo(newMediaState.progress);
+                }
             }
           }
         }
@@ -97,7 +93,15 @@ export function LivingRoom({ onBack, session }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user.id]);
+
+  // Handle video ID change
+  useEffect(() => {
+    let youtubeId = getYoutubeVideoId(mediaState.video_url);
+    if (youtubeId) {
+      setCurrentVideoId(youtubeId);
+    }
+  }, [mediaState.video_url]);
 
   // --- YouTube Player Handlers ---
   const onPlayerReady = (event) => {

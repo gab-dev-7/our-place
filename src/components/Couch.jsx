@@ -3,10 +3,13 @@ import { ArrowLeft, Plus, X, Image, Calendar, BookOpen, MapPin } from "lucide-re
 import { supabase } from "../supabaseClient";
 import { motion, AnimatePresence } from "framer-motion";
 
-const OPENCAGE_API_KEY = "YOUR_OPENCAGE_API_KEY"; // TODO: Replace with your actual API key
+const OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
 
 async function getCoordinatesForLocation(location) {
-  if (!location) return null;
+  if (!location || !OPENCAGE_API_KEY) {
+    if (!OPENCAGE_API_KEY) console.error("OpenCage API key is missing.");
+    return null;
+  }
 
   const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
     location
@@ -77,7 +80,7 @@ export function Couch({ onBack, session }) {
     if (newMemory.location) {
       coords = await getCoordinatesForLocation(newMemory.location);
       if (!coords) {
-        alert(`Could not find coordinates for "${newMemory.location}". Please check the spelling or be more specific.`);
+        alert('Could not find coordinates for &apos;' + newMemory.location + '&apos;. Please check the spelling or be more specific.');
         setUploading(false);
         return;
       }
@@ -90,7 +93,7 @@ export function Couch({ onBack, session }) {
 
     // Upload image to Supabase Storage
     const { error: uploadError } = await supabase.storage
-      .from("memories")
+      .from("memories_storage")
       .upload(filePath, newMemory.file);
 
     if (uploadError) {
@@ -102,7 +105,7 @@ export function Couch({ onBack, session }) {
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
-      .from("memories")
+      .from("memories_storage")
       .getPublicUrl(filePath);
 
     // Insert metadata into Supabase table
